@@ -14,6 +14,7 @@
 
 <script>
 // import axios from 'axios';
+import router from '@/router';
 
 export default {
   data() {
@@ -23,6 +24,7 @@ export default {
       email: "",
       password2:"",
       error: '',
+      route : router
     };
   },
   methods: {
@@ -32,12 +34,6 @@ export default {
         return
       }
       try {
-        // await axios.post('http://localhost:8000/register', {
-        //   username: this.username,
-        //   password: this.password,
-        // });
-        // this.error = '';
-        // Optionally redirect to login or dashboard
         fetch('http://127.0.0.1:8000/register', {
         method: 'POST',
         headers: {
@@ -58,6 +54,8 @@ export default {
 })
 .then(data => {
   console.log(data); // Handle the response data here 
+  alert("Register successfully!")
+  this.route.push('/login')
 })
 .catch(error => {
   console.error('There was a problem with the fetch operation:', error);

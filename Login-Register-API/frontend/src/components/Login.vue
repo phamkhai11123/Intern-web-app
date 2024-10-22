@@ -19,6 +19,7 @@ export default {
       username: '',
       password: '',
       error: null,
+      router:router
     };
   },
   methods: {
@@ -34,6 +35,7 @@ export default {
         });
         localStorage.setItem('access_token', response.data.access_token);
         console.log("access_token:",response.data.access_token)
+        this.router.push('/info')
       } catch (err) {
         this.error = 'Login failed!';
       }

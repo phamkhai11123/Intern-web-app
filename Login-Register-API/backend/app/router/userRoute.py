@@ -57,24 +57,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : Session =
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Get current user
-@router.get("/users/me", response_model=userSchema.UserResponse)
-async def read_users_me(token: str = Depends(oauth.oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-
-    db: Session = database.SessionLocal()
-    user = db.query(userModel.User).filter(userModel.User.username == username).first()
-    if user is None:
-        raise credentials_exception
-    return user
+@router.get("/users/me",response_model=userSchema.UserResponse)
+async def read_users_me(current_user: userSchema.UserResponse = Depends(oauth.get_current_user)):
+    return current_user
 

@@ -14,18 +14,13 @@ from .router import userRoute
 # FastAPI instance
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",  # your Vue.js app
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Adjust this for production
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
 
 app.include_router(userRoute.router)
 
