@@ -2,6 +2,7 @@
   <div>
     <h1>Register</h1>
     <form @submit.prevent="register">
+      <input class="form-control my-2" type="text" v-model="name" placeholder="Fullname" required />
       <input class="form-control my-2" type="text" v-model="username" placeholder="Username" required />
       <input class="form-control my-2" type="text" v-model="email" placeholder="Email" required>
       <input class="form-control my-2" type="password" v-model="password" placeholder="Password" required />
@@ -19,6 +20,7 @@ import router from '@/router';
 export default {
   data() {
     return {
+      name:'',
       username: '',
       password: '',
       email: "",
@@ -41,6 +43,7 @@ export default {
         'Content-Type': 'application/json',
       },
         body: JSON.stringify({
+              name:this.name,
               username: this.username,
               password: this.password,
               email: this.email
@@ -54,7 +57,7 @@ export default {
 })
 .then(data => {
   console.log(data); // Handle the response data here 
-  alert("Register successfully!")
+  // alert("Register successfully!")
   this.route.push('/login')
 })
 .catch(error => {

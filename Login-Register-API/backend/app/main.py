@@ -10,7 +10,10 @@ import os
 from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
 from .router import userRoute
+from .models import userModel
+from .database import database
 
+userModel.database.Base.metadata.create_all(bind= database.engine)
 # FastAPI instance
 app = FastAPI()
 
