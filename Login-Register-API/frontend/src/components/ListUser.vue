@@ -14,6 +14,7 @@
             <td>Name</td>
             <td>Username</td>
             <td>Email</td>
+            <td>Role</td>
             <td>Register day</td>
             <td>--</td>
         </tr>
@@ -24,6 +25,7 @@
             <td>{{ user.name }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
+            <td>{{ user.role  }}</td>
             <td>{{ user.created_at }}</td>
             <td>
               <button class="btn btn-dark" @click="editUser(user)">Update</button>
@@ -57,6 +59,14 @@
         <div>
           <label>Email:</label>
           <input v-model="selectedUser.email" type="email" required  class="form-control"/>
+        </div>
+        <div>
+          <label>Role:</label>
+          <!-- <input v-model="selectedUser.role" type="text" required  class="form-control"/> -->
+          <select name="" id="" v-model="selectedUser.role" class="form-control">
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </select>
         </div>
         <button type="submit" class="btn btn-outline-primary my-2">Update User</button>
       </form>

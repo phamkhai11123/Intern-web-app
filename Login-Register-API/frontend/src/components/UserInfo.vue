@@ -4,6 +4,7 @@
     <p v-if="user">Name: {{ user.name }}</p> 
     <p v-if="user">Username: {{ user.username }}</p>
     <p v-if="user">Email: {{ user.email }}</p> 
+    <p v-if="user" class="text-danger">Role: {{ user.role }}</p> 
     <p v-if="user">Register day: {{ user.created_at }}</p> 
 
     <button v-if="user" class="btn btn-primary" @click="onLogout">Logout</button>

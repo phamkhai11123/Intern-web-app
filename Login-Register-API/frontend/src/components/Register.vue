@@ -7,6 +7,12 @@
       <input class="form-control my-2" type="text" v-model="email" placeholder="Email" required>
       <input class="form-control my-2" type="password" v-model="password" placeholder="Password" required />
       <input class="form-control my-2" type="password" v-model="password2" name="" id="" placeholder="Confirm password">
+      <!-- <input class="form-control my-2" type="text" v-model="role" placeholder="Role" required /> -->
+      <select name="" id="" v-model="role" class="form-control my-2">
+        <option value="">Role</option>
+        <option value="admin">admin</option>
+        <option value="user">user</option>
+      </select>
       <button class="btn btn-warning" type="submit">Register</button>
     </form>
     <p v-if="error">{{ error }}</p>
@@ -25,6 +31,7 @@ export default {
       password: '',
       email: "",
       password2:"",
+      role:"",
       error: '',
       route : router
     };
@@ -46,7 +53,8 @@ export default {
               name:this.name,
               username: this.username,
               password: this.password,
-              email: this.email
+              email: this.email,
+              role :this.role
       })
       })
         .then(response => {

@@ -13,6 +13,14 @@ from ..models import userModel
 from ..schemas import userSchema 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from ..oauth import oauth
+from casbin import Enforcer
+import os
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(base_dir, '../config/model.conf')
+policy_path = os.path.join(base_dir, '../config/policy.csv')
+
+e = Enforcer(model_path, policy_path)
 
 
 router = APIRouter()
@@ -21,6 +29,9 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+def check_permission(user: str, obj: str, act: str):
+    if not e.enforce(user, obj, act):
+        raise HTTPException(status_code=403, detail="Access denied")
 
 @router.post("/register", response_model=userSchema.UserResponse)
 async def register(user: userSchema.UserCreate):
@@ -33,7 +44,8 @@ async def register(user: userSchema.UserCreate):
     new_user = userModel.User(username=user.username,
                                hashed_password=password_hash,
                                email= user.email,
-                               name = user.name )  
+                               name = user.name,
+                                role = user.role)  
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -43,8 +55,10 @@ def get_user(db: Session, username: str):
     return db.query(userModel.User).filter(userModel.User.username == username).first()
 
 @router.get("/user", response_model=List[userSchema.UserResponse] )
-async def get_list_user(db:Session = Depends(database.get_db),current_user: userSchema.UserResponse = Depends(oauth.get_current_user)):
-    if current_user.email == "admin@gmail.com":
+async def get_list_user(db:Session = Depends(database.get_db),user: dict = Depends(oauth.get_current_user)):
+    # if current_user.email == "admin@gmail.com":
+    check_permission(user.role, "/user", "GET")
+    with database.SessionLocal() as db:
         list_user = db.query(userModel.User).all()
         return list_user
     
@@ -82,6 +96,7 @@ def update_user(user_id: int, user_update: userSchema.UserUpdate, db: Session = 
     user.name = user_update.name
     user.username = user_update.username
     user.email = user_update.email
+    user.role = user_update.role
     # user.password = user_update.password  # Consider hashing the password
     db.commit()
     db.refresh(user)

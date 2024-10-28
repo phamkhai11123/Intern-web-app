@@ -14,5 +14,6 @@ class User(database.Base):
     username = Column(String, index=True)
     email = Column(String, index=True)
     hashed_password = Column(String)  
+    role = Column(String) 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

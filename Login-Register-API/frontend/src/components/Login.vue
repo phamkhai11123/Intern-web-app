@@ -34,12 +34,13 @@ export default {
           }
         });
         localStorage.setItem('access_token', response.data.access_token);
-        this.route.push('/info')
+        
         console.log("access_token:",response.data.access_token)
         
       } catch (err) {
         this.error = 'Login failed!';
       }
+      this.route.push('/info')
     }
   }
 };
