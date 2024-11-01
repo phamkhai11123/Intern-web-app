@@ -13,15 +13,7 @@ from ..models import userModel
 from ..schemas import userSchema 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from ..oauth import oauth
-from casbin import Enforcer
-import os
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(base_dir, '../config/model.conf')
-policy_path = os.path.join(base_dir, '../config/policy.csv')
-
-e = Enforcer(model_path, policy_path)
-
+from ..config import enforce
 
 router = APIRouter()
 
@@ -29,9 +21,6 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-def check_permission(user: str, obj: str, act: str):
-    if not e.enforce(user, obj, act):
-        raise HTTPException(status_code=403, detail="Access denied")
 
 @router.post("/register", response_model=userSchema.UserResponse)
 async def register(user: userSchema.UserCreate):
@@ -56,8 +45,7 @@ def get_user(db: Session, username: str):
 
 @router.get("/user", response_model=List[userSchema.UserResponse] )
 async def get_list_user(db:Session = Depends(database.get_db),user: dict = Depends(oauth.get_current_user)):
-    # if current_user.email == "admin@gmail.com":
-    check_permission(user.role, "/user", "GET")
+    enforce.check_permission(user.email,"/user","get")
     with database.SessionLocal() as db:
         list_user = db.query(userModel.User).all()
         return list_user
@@ -67,11 +55,10 @@ async def get_list_user(db:Session = Depends(database.get_db),user: dict = Depen
             detail="You are not admin",
             headers={"WWW-Authenticate": "Bearer"},
             )
-    
-
 # User login and token retrieval
 @router.post("/token",response_model=userSchema.Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : Session = Depends(database.get_db)):
+
     user = get_user(db, form_data.username)
     if not user or not oauth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -89,7 +76,10 @@ async def read_users_me(current_user: userSchema.UserResponse = Depends(oauth.ge
     return current_user
 
 @router.put("/users/{user_id}",response_model=None)
-def update_user(user_id: int, user_update: userSchema.UserUpdate, db: Session = Depends(database.get_db)):
+def update_user(user_id: int, user_update: userSchema.UserUpdate,
+                db: Session = Depends(database.get_db),
+                current_user: dict = Depends(oauth.get_current_user)):
+    enforce.check_permission(current_user.email,'/user','update')
     user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -103,12 +93,11 @@ def update_user(user_id: int, user_update: userSchema.UserUpdate, db: Session = 
     return user
 
 @router.delete("/users/{user_id}", response_model=dict)
-def delete_user(user_id: int, db: Session = Depends(database.get_db)):
-
+def delete_user(user_id: int, db: Session = Depends(database.get_db),current_user: dict = Depends(oauth.get_current_user)):
+    enforce.check_permission(current_user.email,'/user','delete')
     user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
     db.delete(user)
     db.commit()
     return {"detail": "User deleted successfully"}
@@ -116,10 +105,8 @@ def delete_user(user_id: int, db: Session = Depends(database.get_db)):
 @router.get("/queryUsers/", response_model=List[userSchema.UserResponse])
 def get_users(name: str = Query(None), db: Session = Depends(database.get_db)):
     query = db.query(userModel.User)
-
     if name:
         query = query.filter(userModel.User.name.ilike(f"%{name}%"))
-        
     return query.all()
 
 

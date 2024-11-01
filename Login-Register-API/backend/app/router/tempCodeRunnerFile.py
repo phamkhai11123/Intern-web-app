@@ -1,0 +1,1 @@
+ enforce.check_permission(current_user.email,'/user','update')

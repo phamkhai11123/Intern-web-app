@@ -118,9 +118,11 @@ import { onUpdated } from 'vue';
       },
       async updateUser(){
         try{
+          const token = localStorage.getItem('access_token');
           const response = await fetch(`http://127.0.0.1:8000/users/${this.selectedUser.id}`, {
           method: 'PUT',
           headers: {
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(this.selectedUser)
@@ -138,8 +140,13 @@ import { onUpdated } from 'vue';
       async deleteUser(userId){
         if (confirm('Are you sure you want to delete this user?')) {
         try {
+          const token = localStorage.getItem('access_token');
           const response = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
-            method: 'DELETE',
+            method:'DELETE',
+            headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
           });
 
           if (!response.ok) {
