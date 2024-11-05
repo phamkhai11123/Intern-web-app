@@ -24,35 +24,10 @@ def check_permission(user: str, obj: str, act: str):
         print(f"{user} khong được phép thực hiện hành động {act} trên {obj}.")
         raise HTTPException(status_code=403, detail="Access denied")
     
-def get_email_from_token(token: str) -> str:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return payload["email"]
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
 
 
-def get_token_from_request(request: Request) -> str:
-    authorization: str = request.headers.get("Authorization")
-    if not authorization:
-        raise HTTPException(status_code=403, detail="Authorization header missing")
-    token = authorization.split(" ")[1]
-    return token
 
-def check_per(request: Request, token: str = Depends(get_token_from_request)) -> bool:
-    email = get_email_from_token(token)
-    method = request.method
-    path = request.url.path
-    
-    # Casbin check: email (sub), method (act), path (obj)
-    allowed = enf.enforce(email, path, method)
-    
-    if not allowed:
-        raise HTTPException(status_code=403, detail="Permission denied")
-    
-    return True
+
 
 
 
