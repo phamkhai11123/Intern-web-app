@@ -43,13 +43,7 @@ def get_user(db: Session, username: str):
     return db.query(userModel.User).filter(userModel.User.username == username).first()
 
 @router.get("/user", response_model=List[userSchema.UserResponse],)
-async def get_list_user(request:Request,db:Session = Depends(database.get_db),user: dict = Depends(oauth.get_current_user)):
-    
-    print("path:",request.url.path)
-    print("method:",request.method)
-
-    enforce.check_permission(user.email,request.url.path,request.method)
-    
+async def get_list_user(db:Session = Depends(database.get_db),user: dict = Depends(oauth.get_current_user)):
     with database.SessionLocal() as db:
         list_user = db.query(userModel.User).all()
         return list_user
@@ -62,7 +56,6 @@ async def get_list_user(request:Request,db:Session = Depends(database.get_db),us
 # User login and token retrieval
 @router.post("/token",response_model=userSchema.Token,name="login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : Session = Depends(database.get_db)):
-
     user = get_user(db, form_data.username)
     if not user or not oauth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -79,15 +72,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : Session =
 async def read_users_me(current_user: userSchema.UserResponse = Depends(oauth.get_current_user)):
     return current_user
 
-@router.put("/users/{user_id}",response_model=None,)
-def update_user(request: Request ,user_id: int, user_update: userSchema.UserUpdate,
+@router.put("/users/{user_id}",response_model=None)
+def update_user(user_id: int, user_update: userSchema.UserUpdate,
                 db: Session = Depends(database.get_db),
                 current_user: dict = Depends(oauth.get_current_user)):
-    
-    print("path:",request.url.path)
-    print("method:",request.method)
-
-    enforce.check_permission(current_user.email,request.url.path,request.method)
     
     user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
     if not user:
@@ -99,13 +87,10 @@ def update_user(request: Request ,user_id: int, user_update: userSchema.UserUpda
     db.commit()
     db.refresh(user)
     return user
-  
+   
 
 @router.delete("/users/{user_id}", response_model=dict)
-def delete_user(request:Request,user_id: int, db: Session = Depends(database.get_db),current_user: dict = Depends(oauth.get_current_user)):
-    
-    enforce.check_permission(current_user.email,request.url.path,request.method)
-    
+def delete_user(user_id: int, db: Session = Depends(database.get_db),current_user: dict = Depends(oauth.get_current_user)):
     user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

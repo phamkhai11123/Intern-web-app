@@ -1,7 +1,12 @@
 p,admin,/user,GET
 p,admin,/users/* , PUT
 p,admin,/users/* , DELETE
+p,admin,/users/me,*
+
+p,user,/users/me,*
 
 
-g,admin@gmail.com,admin,
-g,khai11@gmail.com,admin,
+g,admin@gmail.com,admin
+g,khai11@gmail.com,admin
+g,nam11@gmail.com,user
+g,tu11@gmail.com,user

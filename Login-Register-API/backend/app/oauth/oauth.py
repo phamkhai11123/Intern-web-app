@@ -2,10 +2,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from fastapi import Depends,status,HTTPException
+from fastapi import Depends,status,HTTPException,Request
 from ..schemas import userSchema
 from ..database import database
 from ..models import userModel
+from ..config import enforce
 from sqlalchemy.orm import Session
 # Security settings
 
@@ -39,7 +40,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(request:Request, token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(    
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -52,6 +53,11 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
+    
     db: Session = database.SessionLocal()
+    
     user = db.query(userModel.User).filter(userModel.User.username == username).first()
+
+    enforce.check_permission(user.email,request.url.path,request.method)
+   
     return user
