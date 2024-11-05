@@ -1,7 +1,6 @@
-#p,*,/,*
-#p,admin,/user,post
-#p,admin,/user,get
-p,admin,/user,*
+p,admin,/user,GET
+p,admin,/users/* , PUT
+p,admin,/users/* , DELETE
 
 
 g,admin@gmail.com,admin,

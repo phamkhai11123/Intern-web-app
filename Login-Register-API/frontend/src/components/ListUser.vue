@@ -91,6 +91,7 @@ import { onUpdated } from 'vue';
         selectedUser: null,
         error:"",
         users: [],  
+        stt: 0
       };
     },
     computed: {

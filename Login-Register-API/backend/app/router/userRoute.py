@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter,FastAPI,Query
+from fastapi import APIRouter,FastAPI,Query,Request
 from fastapi import FastAPI, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, String
@@ -21,8 +21,7 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-
-@router.post("/register", response_model=userSchema.UserResponse)
+@router.post("/register", response_model=userSchema.UserResponse, )
 async def register(user: userSchema.UserCreate):
     db: Session = database.SessionLocal()
     existing_user = db.query(userModel.User).filter(userModel.User.username == user.username).first()
@@ -43,9 +42,14 @@ async def register(user: userSchema.UserCreate):
 def get_user(db: Session, username: str):
     return db.query(userModel.User).filter(userModel.User.username == username).first()
 
-@router.get("/user", response_model=List[userSchema.UserResponse] )
-async def get_list_user(db:Session = Depends(database.get_db),user: dict = Depends(oauth.get_current_user)):
-    enforce.check_permission(user.email,"/user","get")
+@router.get("/user", response_model=List[userSchema.UserResponse],)
+async def get_list_user(request:Request,db:Session = Depends(database.get_db),user: dict = Depends(oauth.get_current_user)):
+    
+    print("path:",request.url.path)
+    print("method:",request.method)
+
+    enforce.check_permission(user.email,request.url.path,request.method)
+    
     with database.SessionLocal() as db:
         list_user = db.query(userModel.User).all()
         return list_user
@@ -56,7 +60,7 @@ async def get_list_user(db:Session = Depends(database.get_db),user: dict = Depen
             headers={"WWW-Authenticate": "Bearer"},
             )
 # User login and token retrieval
-@router.post("/token",response_model=userSchema.Token)
+@router.post("/token",response_model=userSchema.Token,name="login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : Session = Depends(database.get_db)):
 
     user = get_user(db, form_data.username)
@@ -71,15 +75,20 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : Session =
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Get current user
-@router.get("/users/me",response_model = userSchema.UserResponse)
+@router.get("/users/me",response_model = userSchema.UserResponse, )
 async def read_users_me(current_user: userSchema.UserResponse = Depends(oauth.get_current_user)):
     return current_user
 
-@router.put("/users/{user_id}",response_model=None)
-def update_user(user_id: int, user_update: userSchema.UserUpdate,
+@router.put("/users/{user_id}",response_model=None,)
+def update_user(request: Request ,user_id: int, user_update: userSchema.UserUpdate,
                 db: Session = Depends(database.get_db),
                 current_user: dict = Depends(oauth.get_current_user)):
-    enforce.check_permission(current_user.email,'/user','update')
+    
+    print("path:",request.url.path)
+    print("method:",request.method)
+
+    enforce.check_permission(current_user.email,request.url.path,request.method)
+    
     user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -87,14 +96,16 @@ def update_user(user_id: int, user_update: userSchema.UserUpdate,
     user.username = user_update.username
     user.email = user_update.email
     user.role = user_update.role
-    # user.password = user_update.password  # Consider hashing the password
     db.commit()
     db.refresh(user)
     return user
+  
 
 @router.delete("/users/{user_id}", response_model=dict)
-def delete_user(user_id: int, db: Session = Depends(database.get_db),current_user: dict = Depends(oauth.get_current_user)):
-    enforce.check_permission(current_user.email,'/user','delete')
+def delete_user(request:Request,user_id: int, db: Session = Depends(database.get_db),current_user: dict = Depends(oauth.get_current_user)):
+    
+    enforce.check_permission(current_user.email,request.url.path,request.method)
+    
     user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -108,6 +119,9 @@ def get_users(name: str = Query(None), db: Session = Depends(database.get_db)):
     if name:
         query = query.filter(userModel.User.name.ilike(f"%{name}%"))
     return query.all()
+
+
+
 
 
 
