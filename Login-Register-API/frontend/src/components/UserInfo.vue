@@ -40,7 +40,7 @@ export default {
     const token = localStorage.getItem('access_token');
     if (token){
       try {
-        const response = await axios.get('http://127.0.0.1:8000/users/me',{
+        const response = await axios.get('http://172.23.224.1:8000/users/me',{
           headers: {
             Authorization: `Bearer ${token}`,
           },

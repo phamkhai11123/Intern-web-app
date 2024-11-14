@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: fastapi
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Use named volume to persist data
+    networks:
+      - app-network
+
+  fastapi:
+    build: .
+    container_name: backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:admin@172.23.224.1:5433/fastapi
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    
+volumes:
+  postgres_data:  # Named volume for PostgreSQL data persistence
+
+networks:
+  app-network:
+    driver: bridge
+    
+    

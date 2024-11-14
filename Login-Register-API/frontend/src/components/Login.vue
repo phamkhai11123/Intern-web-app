@@ -25,7 +25,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post('http://127.0.0.1:8000/token', new URLSearchParams({
+        const response = await axios.post('http://172.23.224.1:8000/token', new URLSearchParams({
           username: this.username,
           password: this.password
         }), {

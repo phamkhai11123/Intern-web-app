@@ -12,5 +12,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  }
+  },
+  server: {
+    host: '0.0.0.0', // Make the dev server accessible externally
+    port: 8080,      // Optionally change the port to 8080, if needed
+  },
 })

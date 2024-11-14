@@ -2,7 +2,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 
-DATABASE_URL = "postgresql://postgres:admin@localhost/fastapi"  # Update with your DB credentials
+DATABASE_URL = "postgresql://postgres:admin@172.23.224.1:5433/fastapi"  # Update with your DB credentials
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
