@@ -1,23 +1,20 @@
-# Use Node.js version 16
-FROM node:16
+# Sử dụng image Node.js chính thức
+FROM node:18
 
-# Set the working directory in the container
+# Thiết lập thư mục làm việc trong container
 WORKDIR /app
 
-# Install npm version 8.x (compatible with Node.js 16)
-RUN npm install -g npm@8
+# Sao chép package.json và package-lock.json vào container
+COPY package*.json ./
 
-# Copy package.json and package-lock.json to the container
-COPY package.json package-lock.json ./
-
-# Install dependencies inside the container
+# Cài đặt các phụ thuộc
 RUN npm install
 
-# Copy the rest of the application files to the container
+# Sao chép mã nguồn Vue.js vào container
 COPY . .
 
-# Expose the port the Vue.js development server will use
+# Mở cổng 8080 (Vue.js mặc định chạy ở cổng này khi phát triển)
 EXPOSE 8080
 
-# Start the Vue.js development server using npm run dev
+# Chạy ứng dụng Vue.js trong chế độ phát triển
 CMD ["npm", "run", "dev"]
