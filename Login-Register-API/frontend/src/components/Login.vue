@@ -13,19 +13,21 @@
 <script>
 import axios from 'axios';
 import router from '@/router';
+
 export default {
   data() {
     return {
       username: '',
       password: '',
       error: null,
-      route: router
+      route: router,
+      apiUrl : process.env.VUE_APP_API_URL || 'http://172.23.224.1:8000'
     };
   },
   methods: {
     async login() {
       try {
-        const response = await axios.post('http://172.23.224.1:8000/token', new URLSearchParams({
+        const response = await axios.post(`${this.apiUrl}/token`, new URLSearchParams({
           username: this.username,
           password: this.password
         }), {

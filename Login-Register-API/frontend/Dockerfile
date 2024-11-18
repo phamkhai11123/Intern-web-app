@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Mở cổng 8080 (Vue.js mặc định chạy ở cổng này khi phát triển)
-EXPOSE 8080
+EXPOSE 8081
 
 # Chạy ứng dụng Vue.js trong chế độ phát triển
 CMD ["npm", "run", "dev"]

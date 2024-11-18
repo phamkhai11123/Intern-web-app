@@ -80,7 +80,7 @@
   <script>
   import axios from 'axios';
   import router from '@/router';
-import { onUpdated } from 'vue';
+  import { onUpdated } from 'vue';
 
   export default {
     data() {
@@ -91,7 +91,8 @@ import { onUpdated } from 'vue';
         selectedUser: null,
         error:"",
         users: [],  
-        stt: 0
+        stt: 0,
+        apiUrl : process.env.VUE_APP_API_URL || 'http://172.23.224.1:8000'
       };
     },
     computed: {
@@ -106,7 +107,7 @@ import { onUpdated } from 'vue';
       async fetchUsers(){
         try{
           const token = localStorage.getItem('access_token');
-          const response = await axios.get("http://127.0.0.1:8000/user",{
+          const response = await axios.get(`${this.apiUrl}/user`,{
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -120,7 +121,7 @@ import { onUpdated } from 'vue';
       async updateUser(){
         try{
           const token = localStorage.getItem('access_token');
-          const response = await fetch(`http://127.0.0.1:8000/users/${this.selectedUser.id}`, {
+          const response = await fetch(`${this.apiUrl}/users/${this.selectedUser.id}`, {
           method: 'PUT',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -142,7 +143,7 @@ import { onUpdated } from 'vue';
         if (confirm('Are you sure you want to delete this user?')) {
         try {
           const token = localStorage.getItem('access_token');
-          const response = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+          const response = await fetch(`${this.apiUrl}/users/${userId}`, {
             method:'DELETE',
             headers: {
             Authorization: `Bearer ${token}`,
@@ -163,7 +164,7 @@ import { onUpdated } from 'vue';
       },
       async queryUsers() {
           try {
-              const response = await fetch(`http://127.0.0.1:8000/queryUsers/?name=${this.searchQuery}`);
+              const response = await fetch(`${this.apiUrl}/queryUsers/?name=${this.searchQuery}`);
               this.users = await response.json();
           } catch (error) {
               console.error('Error fetching users:', error);

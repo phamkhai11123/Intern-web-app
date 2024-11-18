@@ -43,7 +43,7 @@ export default {
         return
       }
       try {
-        fetch('http://127.0.0.1:8000/register', {
+        fetch('http://http://172.23.224.1:8000/register', {
         method: 'POST',
         headers: {
         'Accept': 'application/json',
@@ -79,4 +79,3 @@ export default {
   },
 };
 </script>
-

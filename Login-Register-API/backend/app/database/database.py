@@ -1,15 +1,29 @@
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
+from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 
-DATABASE_URL = "postgresql://postgres:admin@172.23.224.1:5433/fastapi"  # Update with your DB credentials
+load_dotenv()
+
+class Settings(BaseSettings):
+    database_url: str 
+
+    class Config:
+        env_file = ".env"  # Nếu muốn sử dụng tệp .env trong dự án
+
+# Tạo đối tượng cấu hình
+settings = Settings()
+
+DATABASE_URL = settings.database_url  # Update with your DB credentials
+
+print(DATABASE_URL)
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 Base.metadata.create_all(bind=engine)
-
 
 def get_db():
     db = SessionLocal()

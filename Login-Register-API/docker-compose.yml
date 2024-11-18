@@ -19,24 +19,23 @@ services:
     container_name: fastapi-backend
     depends_on:
       - db
-    environment:
-      DATABASE_URL: postgres://postgres:admin@172.23.224.1:5433/fastapi
+    environment: 
+      - DATABASE_URL=postgresql://postgres:admin@172.23.224.1:5433/fastapi
     ports:
       - "8000:8000"
     networks:
       - app-network
 
-
   frontend:
     build: ./frontend
     container_name: vue-frontend
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes:
       - ./frontend:/app 
       - "/app/node_modules"
     environment:
-      - VUE_APP_API_URL=http://backend:8000
+      - VUE_APP_API_URL= http://172.23.224.1:8000
     command: 
         npm run dev
     networks:

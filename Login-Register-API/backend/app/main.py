@@ -9,6 +9,15 @@ from .models import userModel
 from .database import database
 from fastapi.responses import JSONResponse
 from pprint import pprint
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    database_url: str
+
+    class Config:
+        env_file = ".env"  # Đọc từ file .env trong thư mục backend
+
+settings = Settings()
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"  # Use a strong secret key
 ALGORITHM = "HS256"
@@ -17,6 +26,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 userModel.database.Base.metadata.create_all(bind= database.engine)
 # FastAPI instance
 app = FastAPI()
+
+@app.get("/")
+def get_api_key():
+    return {"API_KEY": settings.database_url}
 
 app.add_middleware(
     CORSMiddleware,
