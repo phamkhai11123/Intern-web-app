@@ -8,16 +8,13 @@ from .router import userRoute
 from .models import userModel
 from .database import database
 from fastapi.responses import JSONResponse
-from pprint import pprint
-from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 
-class Settings(BaseSettings):
-    database_url: str
+# Tải các biến môi trường từ .env (nếu có)
+load_dotenv()
 
-    class Config:
-        env_file = ".env"  # Đọc từ file .env trong thư mục backend
-
-settings = Settings()
+# Lấy DATABASE_URL từ biến môi trường
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"  # Use a strong secret key
 ALGORITHM = "HS256"
@@ -27,9 +24,10 @@ userModel.database.Base.metadata.create_all(bind= database.engine)
 # FastAPI instance
 app = FastAPI()
 
+
 @app.get("/")
-def get_api_key():
-    return {"API_KEY": settings.database_url}
+def read_root():
+    return {"DB_URL": DATABASE_URL}
 
 app.add_middleware(
     CORSMiddleware,

@@ -4,9 +4,9 @@ services:
     image: postgres:latest
     container_name: db_postgress
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: fastapi
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5433:5432"
     volumes:
@@ -20,11 +20,13 @@ services:
     depends_on:
       - db
     environment: 
-      - DATABASE_URL=postgresql://postgres:admin@172.23.224.1:5433/fastapi
+     - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
     ports:
-      - "8000:8000"
+      - "${FASTAPI_PORT}:${FASTAPI_PORT}"
     networks:
       - app-network
+    env_file:
+      - .env
 
   frontend:
     build: ./frontend
@@ -34,16 +36,19 @@ services:
     volumes:
       - ./frontend:/app 
       - "/app/node_modules"
-    environment:
-      - VUE_APP_API_URL= http://172.23.224.1:8000
     command: 
         npm run dev
     networks:
       - app-network
-
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env
+    environment:
+      - VUE_APP_API_URL= ${VUE_APP_API_URL}
 
 volumes:
-  postgres_data:  # Named volume for PostgreSQL data persistence
+  postgres_data:  
 
 networks:
   app-network:

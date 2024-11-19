@@ -7,6 +7,7 @@ WORKDIR /app
 # Sao chép package.json và package-lock.json vào container
 COPY package*.json ./
 
+COPY config.yml /app/config.yml
 # Cài đặt các phụ thuộc
 RUN npm install
 
