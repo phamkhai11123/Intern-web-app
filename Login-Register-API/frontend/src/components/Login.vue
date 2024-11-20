@@ -21,7 +21,7 @@ export default {
       password: '',
       error: null,
       route: router,
-      apiUrl : process.env.VUE_APP_API_URL || 'http://172.23.224.1:8000'
+      apiUrl : import.meta.env.VITE_API_URL 
     };
   },
   methods: {

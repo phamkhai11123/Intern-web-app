@@ -1,5 +1,19 @@
-<script setup>
+<script>
 import { RouterLink, RouterView } from 'vue-router'
+// const apiUrl = process.env.VUE_APP_API_URL;
+
+// Sử dụng apiUrl trong các phương thức Vue
+export default {
+  data() {
+    return {
+      // apiUrl: apiUrl,
+    };
+  },
+  mounted() {
+    console.log("META.ENV: ", import.meta.env);
+    console.log("API URL: ", import.meta.env.VITE_API_URL);
+}
+};
 
 </script>
 

@@ -18,8 +18,6 @@
 <script>
 import axios from 'axios';
 import router from '@/router';
-// const route = router
-// const apiurl = process.env.VUE_APP_API_URL
 
 export default {
   data() {
@@ -27,7 +25,7 @@ export default {
       user:null,
       route : router,
       // admin : null
-      apiUrl : process.env.VUE_APP_API_URL || 'http://172.23.224.1:8000'
+      apiUrl : import.meta.env.VITE_API_URL
     };
   },
   methods:{

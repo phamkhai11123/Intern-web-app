@@ -92,7 +92,7 @@
         error:"",
         users: [],  
         stt: 0,
-        apiUrl : process.env.VUE_APP_API_URL || 'http://172.23.224.1:8000'
+        apiUrl :import.meta.env.VITE_API_URL 
       };
     },
     computed: {

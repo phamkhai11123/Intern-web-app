@@ -7,14 +7,13 @@ WORKDIR /app
 # Sao chép package.json và package-lock.json vào container
 COPY package*.json ./
 
-COPY config.yml /app/config.yml
 # Cài đặt các phụ thuộc
 RUN npm install
 
 # Sao chép mã nguồn Vue.js vào container
 COPY . .
 
-# Mở cổng 8080 (Vue.js mặc định chạy ở cổng này khi phát triển)
+
 EXPOSE 8081
 
 # Chạy ứng dụng Vue.js trong chế độ phát triển

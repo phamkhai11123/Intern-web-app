@@ -33,7 +33,8 @@ export default {
       password2:"",
       role:"",
       error: '',
-      route : router
+      route : router,
+      apiUrl : import.meta.env.VITE_API_URL 
     };
   },
   methods: {
@@ -43,7 +44,7 @@ export default {
         return
       }
       try {
-        fetch('http://http://172.23.224.1:8000/register', {
+        fetch(`${this.apiUrl}/register`, {
         method: 'POST',
         headers: {
         'Accept': 'application/json',
